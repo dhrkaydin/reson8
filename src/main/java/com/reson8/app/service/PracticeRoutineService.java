@@ -3,6 +3,7 @@ package com.reson8.app.service;
 import com.reson8.app.model.PracticeRoutine;
 import com.reson8.app.model.PracticeStatistics;
 import com.reson8.app.repository.PracticeRoutineRepository;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +35,11 @@ public class PracticeRoutineService {
 
           return routineRepository.save(existingRoutine);
         })
-        .orElseThrow(() -> new RuntimeException("Routine not found"));
+        .orElseThrow(() -> new RuntimeException("Could not update routine, routine not found"));
   }
 
   public PracticeRoutine getRoutine(Long routineId) {
     return routineRepository.findById(routineId)
-        .orElseThrow(() -> new RuntimeException("Routine not found"));
+        .orElseThrow(() -> new RuntimeException("Could not get routine, routine not found"));
   }
 }

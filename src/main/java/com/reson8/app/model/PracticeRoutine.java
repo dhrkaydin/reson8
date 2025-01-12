@@ -38,4 +38,12 @@ public class PracticeRoutine {
   private List<PracticeSession> sessions;
   @OneToOne(mappedBy = "practiceRoutine", cascade = CascadeType.ALL)
   private PracticeStatistics statistics;
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null || getClass() != obj.getClass()) return false;
+    PracticeRoutine that = (PracticeRoutine) obj;
+    return id != null && id.equals(that.id);
+  }
 }
