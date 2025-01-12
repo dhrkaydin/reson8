@@ -19,7 +19,6 @@ import lombok.Data;
 @Data
 @Entity
 public class PracticeRoutine {
-  // General fields for a routine.
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -30,12 +29,11 @@ public class PracticeRoutine {
   @Enumerated(EnumType.STRING)
   private Category category;
 
-  // Fields related to goals, nullable.
+  // all 3 nullable/optional
   private Integer targetBPM;
   private Integer targetFrequencyInterval;
   private String targetFrequencyUnit;
 
-  // DB related
   @OneToMany(mappedBy = "practiceRoutine", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<PracticeSession> sessions;
   @OneToOne(mappedBy = "practiceRoutine", cascade = CascadeType.ALL)

@@ -28,5 +28,4 @@ public class PracticeSession {
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "practice_routine_id")
   private PracticeRoutine practiceRoutine;
-
 }
