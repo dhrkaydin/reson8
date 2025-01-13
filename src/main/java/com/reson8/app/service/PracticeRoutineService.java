@@ -3,9 +3,12 @@ package com.reson8.app.service;
 import com.reson8.app.model.PracticeRoutine;
 import com.reson8.app.model.PracticeStatistics;
 import com.reson8.app.repository.PracticeRoutineRepository;
+import java.time.LocalDate;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PracticeRoutineService {
@@ -20,6 +23,11 @@ public class PracticeRoutineService {
 
   public PracticeRoutine createRoutine(PracticeRoutine routine) {
     return routineRepository.save(routine);
+  }
+
+  public PracticeRoutine getRoutine(Long routineId) {
+    return routineRepository.findById(routineId)
+        .orElseThrow(() -> new NoSuchElementException("Could not get routine, routine not found"));
   }
 
   //TODO: Make this dynamic based on the changed fields in the PracticeRoutine object. Might be overkill though.
@@ -38,8 +46,8 @@ public class PracticeRoutineService {
         .orElseThrow(() -> new RuntimeException("Could not update routine, routine not found"));
   }
 
-  public PracticeRoutine getRoutine(Long routineId) {
-    return routineRepository.findById(routineId)
-        .orElseThrow(() -> new RuntimeException("Could not get routine, routine not found"));
+  @Transactional
+  public void deleteRoutine(Long routineId) {
+    routineRepository.deleteById(routineId);
   }
 }

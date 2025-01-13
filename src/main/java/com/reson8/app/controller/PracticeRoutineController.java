@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * A simple controller to create, update, and delete routines.
+ */
 @RestController
 @RequestMapping("/api/routines")
 public class PracticeRoutineController {
@@ -30,5 +33,11 @@ public class PracticeRoutineController {
   public ResponseEntity<PracticeRoutine> getRoutine(@PathVariable Long routineId) {
     PracticeRoutine routine = routineService.getRoutine(routineId);
     return new ResponseEntity<>(routine, HttpStatus.OK);
+  }
+
+  @DeleteMapping("/{routineId}")
+  public ResponseEntity<String> deleteRoutine(@PathVariable Long routineId) {
+    routineService.deleteRoutine(routineId);
+    return new ResponseEntity<>("Successfully deleted routine.", HttpStatus.OK);
   }
 }

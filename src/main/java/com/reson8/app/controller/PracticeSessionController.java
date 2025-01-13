@@ -33,4 +33,10 @@ public class PracticeSessionController {
     PracticeSession session = sessionService.updateSession(sessionId, updatedSession);
     return ResponseEntity.ok(session); // Return updated session with status 200 OK
   }
+
+  @DeleteMapping("/session/{sessionId}")
+  public ResponseEntity<String> deleteSession(@PathVariable Long sessionId) {
+    sessionService.deleteSession(sessionId);
+    return new ResponseEntity<>("Session deleted", HttpStatus.OK);
+  }
 }

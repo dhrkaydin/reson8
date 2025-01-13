@@ -20,3 +20,10 @@ but I did not want to get caught up in optimization too much.
 Next I should create some kind of interface to interact with this back-end and provide actual data, to see if it indeed works as I think.
 
 ----------
+
+13-01-2025:
+Added some validation to the entities and some error handling so that the API returns useful error messages. Tested everything manually
+using Postman, next to having unit tests. I added the postman collection in a new /resources/ folder in the project root. Now it should be ready to handle a front-end.
+Some short term goals:
+- Setting up a front-end.
+- Switching the H2 database to something that actually persists. (Decide on a DB)

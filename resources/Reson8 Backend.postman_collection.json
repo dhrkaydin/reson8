@@ -1,0 +1,124 @@
+{
+	"info": {
+		"_postman_id": "10654d2e-5870-4409-8281-051fb451da38",
+		"name": "Reson8 Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25097072"
+	},
+	"item": [
+		{
+			"name": "Get Request",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/routines/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"routines",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Request",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Guitar Practice\",\n  \"description\": \"Daily guitar practice routine\",\n  \"durationInMinutes\": 30\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/api/routines/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"routines",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Request",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Morning Practice\",\n    \"createdDate\": \"2025-01-13\",\n    \"description\": \"A routine for practicing scales and arpeggios.\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/api/routines",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"routines"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Put Request",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Updated Morning Practice\",\n    \"description\": \"An updated routine for practicing scales and arpeggios.\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/api/routines/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"routines",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

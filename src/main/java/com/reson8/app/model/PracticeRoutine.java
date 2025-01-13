@@ -9,6 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Data;
@@ -22,9 +25,12 @@ public class PracticeRoutine {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  @NotBlank(message = "Title can not be null")
+  @Size(min = 1, message = "Title can not be empty")
   private String title;
   private String description;
   private String tabNotation;
+  @NotNull(message = "Date can not be null")
   private LocalDate createdDate;
   @Enumerated(EnumType.STRING)
   private Category category;

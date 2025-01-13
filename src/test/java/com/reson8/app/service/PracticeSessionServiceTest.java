@@ -8,6 +8,7 @@ import com.reson8.app.model.PracticeRoutine;
 import com.reson8.app.model.PracticeSession;
 import com.reson8.app.repository.PracticeRoutineRepository;
 import com.reson8.app.repository.PracticeSessionRepository;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -48,7 +49,7 @@ class PracticeSessionServiceTest {
     sampleSession = new PracticeSession();
     sampleSession.setId(1L);
     sampleSession.setPracticeRoutine(sampleRoutine);
-    sampleSession.setSessionDate(LocalDateTime.of(2025, 1, 12, 14, 0));
+    sampleSession.setSessionDate(LocalDate.of(2025, 1, 12));
     sampleSession.setBpm(120);
     sampleSession.setDuration(30);
   }
@@ -61,7 +62,7 @@ class PracticeSessionServiceTest {
 
     assertNotNull(createdSession);
     assertEquals(1L, createdSession.getId());
-    assertEquals(LocalDateTime.of(2025, 1, 12, 14, 0), createdSession.getSessionDate());
+    assertEquals(LocalDate.of(2025, 1, 12), createdSession.getSessionDate());
     assertEquals(120, createdSession.getBpm());
     assertEquals(30, createdSession.getDuration());
     verify(sessionRepository, times(1)).save(sampleSession);
@@ -100,7 +101,7 @@ class PracticeSessionServiceTest {
     PracticeSession updatedSession = new PracticeSession();
     updatedSession.setId(1L);
     updatedSession.setPracticeRoutine(sampleRoutine);
-    updatedSession.setSessionDate(LocalDateTime.of(2025, 1, 13, 14, 0));
+    updatedSession.setSessionDate(LocalDate.of(2025, 1, 13));
     updatedSession.setBpm(130);
     updatedSession.setDuration(40);
 
@@ -110,7 +111,7 @@ class PracticeSessionServiceTest {
     PracticeSession result = sessionService.updateSession(1L, updatedSession);
 
     assertNotNull(result);
-    assertEquals(LocalDateTime.of(2025, 1, 13, 14, 0), result.getSessionDate());
+    assertEquals(LocalDate.of(2025, 1, 13), result.getSessionDate());
     assertEquals(130, result.getBpm());
     assertEquals(40, result.getDuration());
     verify(sessionRepository, times(1)).save(updatedSession);
