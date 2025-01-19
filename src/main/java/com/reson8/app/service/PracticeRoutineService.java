@@ -21,6 +21,7 @@ public class PracticeRoutineService {
   @Autowired
   private PracticeStatisticsService statisticsService;
 
+  @Transactional
   public PracticeRoutine createRoutine(PracticeRoutine routine) {
     return routineRepository.save(routine);
   }
@@ -37,7 +38,6 @@ public class PracticeRoutineService {
           existingRoutine.setTitle(routine.getTitle());
           existingRoutine.setDescription(routine.getDescription());
           existingRoutine.setCategory(routine.getCategory());
-          existingRoutine.setTabNotation(routine.getTabNotation());
 
           // Sessions and statistics should be updated through their respective services.
 

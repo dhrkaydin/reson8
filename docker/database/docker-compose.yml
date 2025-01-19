@@ -1,0 +1,19 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: practice_tracker_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: practice_tracker_db
+      MYSQL_USER: practice_user
+      MYSQL_PASSWORD: userpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - practice_tracker_network
+
+networks:
+  practice_tracker_network:
+    driver: bridge

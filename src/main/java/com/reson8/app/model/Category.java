@@ -5,5 +5,6 @@ public enum Category {
   CHORDS,
   ARPEGGIOS,
   TECHNIQUE,
-  SONGS
+  SONGS,
+  IMPROVISATION,
 }

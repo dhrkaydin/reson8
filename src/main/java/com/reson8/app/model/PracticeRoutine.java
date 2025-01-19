@@ -1,6 +1,7 @@
 package com.reson8.app.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,22 +23,35 @@ import lombok.Data;
 @Data
 @Entity
 public class PracticeRoutine {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
   @NotBlank(message = "Title can not be null")
   @Size(min = 1, message = "Title can not be empty")
+  @Column(name = "title")
   private String title;
+
+  @Column(name = "description")
   private String description;
-  private String tabNotation;
+
   @NotNull(message = "Date can not be null")
+  @Column(name = "created_date")
   private LocalDate createdDate;
+
   @Enumerated(EnumType.STRING)
+  @Column(name = "category")
   private Category category;
 
   // all 3 nullable/optional
+  @Column(name = "target_bpm")
   private Integer targetBPM;
+
+  @Column(name = "target_frequency_interval")
   private Integer targetFrequencyInterval;
+
+  @Column(name = "target_frequency_unit")
   private String targetFrequencyUnit;
 
   @OneToMany(mappedBy = "practiceRoutine", cascade = CascadeType.ALL, orphanRemoval = true)

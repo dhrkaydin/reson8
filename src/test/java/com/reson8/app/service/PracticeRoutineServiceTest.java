@@ -31,7 +31,6 @@ class PracticeRoutineServiceTest {
     sampleRoutine.setTitle("Test Routine");
     sampleRoutine.setDescription("Test Description");
     sampleRoutine.setCategory(Category.CHORDS);
-    sampleRoutine.setTabNotation("Test Tab Notation");
   }
 
   @Test
@@ -54,7 +53,6 @@ class PracticeRoutineServiceTest {
     updatedRoutine.setTitle("Updated Title");
     updatedRoutine.setDescription("Updated Description");
     updatedRoutine.setCategory(Category.ARPEGGIOS);
-    updatedRoutine.setTabNotation("Updated Tab Notation");
 
     when(routineRepository.save(any(PracticeRoutine.class))).thenAnswer(invocation -> {
       PracticeRoutine updated = invocation.getArgument(0);
@@ -67,7 +65,6 @@ class PracticeRoutineServiceTest {
     assertNotNull(result);
     assertEquals("Updated Title", result.getTitle());
     assertEquals("Updated Description", result.getDescription());
-    assertEquals("Updated Tab Notation", result.getTabNotation());
     assertEquals(Category.ARPEGGIOS, result.getCategory());
     verify(routineRepository, times(1)).save(any(PracticeRoutine.class));  // Verify save was called
   }
@@ -79,7 +76,6 @@ class PracticeRoutineServiceTest {
     RuntimeException exception = assertThrows(RuntimeException.class, () -> {
       routineService.updateRoutine(1L, sampleRoutine);
     });
-
     assertEquals("Could not update routine, routine not found", exception.getMessage());
   }
 
@@ -94,24 +90,18 @@ class PracticeRoutineServiceTest {
     assertEquals("Test Routine", result.getTitle());
     assertEquals("Test Description", result.getDescription());
     assertEquals(Category.CHORDS, result.getCategory());
-    assertEquals("Test Tab Notation", result.getTabNotation());
     verify(routineRepository, times(1)).findById(1L);
   }
 
   @Test
   void getRoutine_ShouldThrowException_WhenRoutineNotFound() {
-    // Mock the findById method to return an empty Optional (routine not found)
     when(routineRepository.findById(1L)).thenReturn(Optional.empty());
 
-    // Call the service method and assert that an exception is thrown
     RuntimeException exception = assertThrows(RuntimeException.class, () -> {
       routineService.getRoutine(1L);
     });
 
-    // Verify the exception message
     assertEquals("Could not get routine, routine not found", exception.getMessage());
-
-    // Verify the findById method was called once
     verify(routineRepository, times(1)).findById(1L);
   }
 }

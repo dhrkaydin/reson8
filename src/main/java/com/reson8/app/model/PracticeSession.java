@@ -1,6 +1,7 @@
 package com.reson8.app.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,9 +22,15 @@ public class PracticeSession {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
   @NotNull(message = "Date can not be null")
+  @Column(name = "session_date")
   private LocalDate sessionDate;
+
+  @Column(name = "bpm")
   private int bpm;
+
+  @Column(name = "duration")
   private int duration;
 
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
