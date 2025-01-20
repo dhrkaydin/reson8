@@ -1,5 +1,7 @@
 package com.reson8.app.service;
 
+import com.reson8.app.dto.PracticeSessionDTO;
+import com.reson8.app.mapper.PracticeSessionMapper;
 import com.reson8.app.model.PracticeRoutine;
 import com.reson8.app.model.PracticeSession;
 import com.reson8.app.repository.PracticeRoutineRepository;
@@ -17,45 +19,42 @@ public class PracticeSessionService {
   private PracticeSessionRepository sessionRepo;
   @Autowired
   private PracticeRoutineRepository routineRepo;
-
   @Autowired
   private PracticeStatisticsService statsService;
+  @Autowired
+  private PracticeSessionMapper mapper;
 
-  //TODO: Update the stats in an async way or look into a more optimal way.
-  public PracticeSession createSession(PracticeSession session) {
-    PracticeSession createdSession = sessionRepo.save(session);
-    updateStatsForSession(createdSession);
-    return createdSession;
-  }
-
-  public List<PracticeSession> getSessions(Long routineId) {
-    PracticeRoutine routine = routineRepo.findById(routineId)
+  // TODO: Update the stats in an async way or look into a more optimal way.
+  public PracticeSessionDTO createSession(PracticeSessionDTO session) {
+    PracticeRoutine routine = routineRepo.findById(session.getPracticeRoutineId())
         .orElseThrow(() -> new NoSuchElementException("Routine not found"));
-    return sessionRepo.findByPracticeRoutine(routine);
+
+    PracticeSession entity = mapper.toEntity(session);
+    entity.setPracticeRoutine(routine);
+
+    PracticeSession createdSession = sessionRepo.save(entity);
+    updateStatsForSession(createdSession);
+    return mapper.toDto(createdSession);
   }
 
-  public PracticeSession updateSession(Long sessionId, PracticeSession updatedSession) {
+  public List<PracticeSessionDTO> getSessions(Long routineId) {
+    return sessionRepo.findByPracticeRoutineId(routineId).stream()
+        .map(mapper::toDto)
+        .toList();
+  }
+
+  public PracticeSessionDTO updateSession(Long sessionId, PracticeSessionDTO updatedSession) {
     return sessionRepo.findById(sessionId)
-        .map(existingSession -> {
-          existingSession.setBpm(updatedSession.getBpm());
-          existingSession.setDuration(updatedSession.getDuration());
-          existingSession.setSessionDate(updatedSession.getSessionDate());
+        .map(session -> {
+          session.setBpm(updatedSession.getBpm());
+          session.setDuration(updatedSession.getDuration());
+          session.setSessionDate(updatedSession.getSessionDate());
+          PracticeSession updated = sessionRepo.save(session);
 
-          if (!existingSession.getPracticeRoutine().equals(updatedSession.getPracticeRoutine())) {
-            PracticeRoutine oldRoutine = existingSession.getPracticeRoutine();
-            PracticeRoutine newRoutine = updatedSession.getPracticeRoutine();
-
-            oldRoutine.getSessions().remove(existingSession);
-            existingSession.setPracticeRoutine(newRoutine);
-            newRoutine.getSessions().add(existingSession);
-          }
-
-          PracticeSession savedSession = sessionRepo.save(existingSession);
-          updateStatsForSession(savedSession);
-
-          return savedSession;
+          updateStatsForSession(updated);
+          return mapper.toDto(updated);
         })
-        .orElseThrow(() -> new RuntimeException("Session not found"));
+        .orElseThrow(() -> new NoSuchElementException("Can not update: Session not found"));
   }
 
   public void deleteSession(Long sessionId) {
@@ -63,6 +62,6 @@ public class PracticeSessionService {
   }
 
   public void updateStatsForSession(PracticeSession session) {
-    statsService.updateStats(session.getPracticeRoutine().getId());
+    statsService.updateStats(session.getId());
   }
 }

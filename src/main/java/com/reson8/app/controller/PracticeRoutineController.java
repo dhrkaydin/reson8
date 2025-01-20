@@ -1,7 +1,8 @@
 package com.reson8.app.controller;
 
-import com.reson8.app.model.PracticeRoutine;
+import com.reson8.app.dto.PracticeRoutineDTO;
 import com.reson8.app.service.PracticeRoutineService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +19,27 @@ public class PracticeRoutineController {
   private PracticeRoutineService routineService;
 
   @PostMapping
-  public ResponseEntity<PracticeRoutine> createRoutine(@RequestBody PracticeRoutine routine) {
-    PracticeRoutine createdRoutine = routineService.createRoutine(routine);
+  public ResponseEntity<PracticeRoutineDTO> createRoutine(@RequestBody PracticeRoutineDTO routine) {
+    PracticeRoutineDTO createdRoutine = routineService.createRoutine(routine);
     return new ResponseEntity<>(createdRoutine, HttpStatus.CREATED);
   }
 
   @PutMapping("/{routineId}")
-  public ResponseEntity<PracticeRoutine> updateRoutine(@PathVariable Long routineId, @RequestBody PracticeRoutine routine) {
-    PracticeRoutine updatedRoutine = routineService.updateRoutine(routineId, routine);
+  public ResponseEntity<PracticeRoutineDTO> updateRoutine(@PathVariable Long routineId, @RequestBody PracticeRoutineDTO routine) {
+    PracticeRoutineDTO updatedRoutine = routineService.updateRoutine(routineId, routine);
     return new ResponseEntity<>(updatedRoutine, HttpStatus.OK);
   }
 
   @GetMapping("/{routineId}")
-  public ResponseEntity<PracticeRoutine> getRoutine(@PathVariable Long routineId) {
-    PracticeRoutine routine = routineService.getRoutine(routineId);
+  public ResponseEntity<PracticeRoutineDTO> getRoutine(@PathVariable Long routineId) {
+    PracticeRoutineDTO routine = routineService.getRoutine(routineId);
     return new ResponseEntity<>(routine, HttpStatus.OK);
+  }
+
+  @GetMapping
+  public ResponseEntity<List<PracticeRoutineDTO>> getAllRoutines() {
+    List<PracticeRoutineDTO> routines = routineService.getAllRoutines(); // Call the service to fetch all routines
+    return new ResponseEntity<>(routines, HttpStatus.OK);
   }
 
   @DeleteMapping("/{routineId}")

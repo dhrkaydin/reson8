@@ -31,6 +31,6 @@ public class PracticeStatistics {
   private int totalBPMIncrease;
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "practice_routine_id")
+  @JoinColumn(name = "practice_routine_id", nullable = false)
   private PracticeRoutine practiceRoutine;
 }

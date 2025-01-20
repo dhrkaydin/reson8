@@ -33,7 +33,7 @@ public class PracticeSession {
   @Column(name = "duration")
   private int duration;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  @JoinColumn(name = "practice_routine_id")
+  @ManyToOne
+  @JoinColumn(name = "practice_routine_id", nullable = false)
   private PracticeRoutine practiceRoutine;
 }

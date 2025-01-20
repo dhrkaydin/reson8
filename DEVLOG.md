@@ -27,3 +27,21 @@ using Postman, next to having unit tests. I added the postman collection in a ne
 Some short term goals:
 - Setting up a front-end.
 - Switching the H2 database to something that actually persists. (Decide on a DB)
+
+-----------
+
+20-01-2025:
+Okay it is actually wild first of all that Copilot is trying to autocomplete what I will put in my devlog. Let me just write this myself. (<- Copilot autocompleted that actually)  
+
+I set up a simple front-end using React and Vite, and I'm using Axios to interact with the back-end. I also created a dockerized MySQL database and replaced the H2 database,
+which was a temporary solution anyways.
+
+Currently, I am doing what I should have been doing to begin with: Creating DTO's to separate the entities from the data that is actually sent to the front-end.
+After I refactor this logic, and the corresponding tests, the next step will be to make sure that the E2E flow is working.
+During this refactor I need to take care that the 3 models maintain their relationships properly, and there are no oversights in the mapping.
+I chose to manually map instead of something like Mapstruct, because I'm trying to avoid adding too many dependencies, 
+and I don't need complex mapping for now as I only have 3 models.
+
+I looked into removing the PracticeRoutine object in the other 2 models, but then I have to manually manage orphan removal and such, which does not seem like the right option to me.
+So I will rollback that design choice.
+----------- 

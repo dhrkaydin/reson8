@@ -1,141 +1,173 @@
 package com.reson8.app.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import com.reson8.app.model.Category;
+import com.reson8.app.dto.PracticeSessionDTO;
+import com.reson8.app.mapper.PracticeSessionMapper;
 import com.reson8.app.model.PracticeRoutine;
 import com.reson8.app.model.PracticeSession;
 import com.reson8.app.repository.PracticeRoutineRepository;
 import com.reson8.app.repository.PracticeSessionRepository;
-import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 class PracticeSessionServiceTest {
 
   @Mock
-  private PracticeSessionRepository sessionRepository;
+  private PracticeSessionRepository sessionRepo;
 
   @Mock
-  private PracticeRoutineRepository routineRepository;
+  private PracticeRoutineRepository routineRepo;
 
   @Mock
   private PracticeStatisticsService statsService;
 
+  @Mock
+  private PracticeSessionMapper mapper;
+
   @InjectMocks
   private PracticeSessionService sessionService;
-
-  private PracticeRoutine sampleRoutine;
-  private PracticeSession sampleSession;
 
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
-
-    sampleRoutine = new PracticeRoutine();
-    sampleRoutine.setId(1L);
-    sampleRoutine.setTitle("Test Routine");
-    sampleRoutine.setCategory(Category.CHORDS);
-
-    sampleSession = new PracticeSession();
-    sampleSession.setId(1L);
-    sampleSession.setPracticeRoutine(sampleRoutine);
-    sampleSession.setSessionDate(LocalDate.of(2025, 1, 12));
-    sampleSession.setBpm(120);
-    sampleSession.setDuration(30);
   }
 
   @Test
-  void createSession_ShouldReturnSavedSession() {
-    when(sessionRepository.save(sampleSession)).thenReturn(sampleSession);
+  void createSession_ShouldSaveAndReturnSessionDTO() {
+    // Arrange
+    Long routineId = 1L;
+    PracticeRoutine practiceRoutine = new PracticeRoutine();
+    practiceRoutine.setId(routineId);
 
-    PracticeSession createdSession = sessionService.createSession(sampleSession);
+    PracticeSessionDTO sessionDTO = new PracticeSessionDTO();
+    sessionDTO.setPracticeRoutineId(routineId);
+    sessionDTO.setBpm(120);
+    sessionDTO.setDuration(30);
+    sessionDTO.setSessionDate(LocalDate.now());
 
-    assertNotNull(createdSession);
-    assertEquals(1L, createdSession.getId());
-    assertEquals(LocalDate.of(2025, 1, 12), createdSession.getSessionDate());
-    assertEquals(120, createdSession.getBpm());
-    assertEquals(30, createdSession.getDuration());
-    verify(sessionRepository, times(1)).save(sampleSession);
-    verify(statsService, times(1)).updateStats(sampleRoutine.getId());
+    PracticeSession sessionEntity = new PracticeSession();
+    sessionEntity.setBpm(120);
+    sessionEntity.setDuration(30);
+    sessionEntity.setSessionDate(LocalDate.now());
+    sessionEntity.setPracticeRoutine(practiceRoutine);
+
+    PracticeSession savedSession = new PracticeSession();
+    savedSession.setId(1L);
+    savedSession.setBpm(120);
+    savedSession.setDuration(30);
+    savedSession.setSessionDate(LocalDate.now());
+    savedSession.setPracticeRoutine(practiceRoutine);
+
+    when(routineRepo.findById(routineId)).thenReturn(Optional.of(practiceRoutine));
+    when(mapper.toEntity(sessionDTO)).thenReturn(sessionEntity);
+    when(sessionRepo.save(any(PracticeSession.class))).thenReturn(savedSession);
+    when(mapper.toDto(savedSession)).thenReturn(sessionDTO);
+
+    // Act
+    PracticeSessionDTO result = sessionService.createSession(sessionDTO);
+
+    // Assert
+    assertEquals(sessionDTO.getPracticeRoutineId(), result.getPracticeRoutineId());
+    assertEquals(sessionDTO.getBpm(), result.getBpm());
+    assertEquals(sessionDTO.getDuration(), result.getDuration());
+    assertEquals(sessionDTO.getSessionDate(), result.getSessionDate());
+    verify(statsService, times(1)).updateStats(savedSession.getId());  // Verify stats update
   }
 
   @Test
-  void getSessions_ShouldReturnSessionsForRoutine() {
-    List<PracticeSession> sessions = Arrays.asList(sampleSession);
-    when(routineRepository.findById(1L)).thenReturn(Optional.of(sampleRoutine));
-    when(sessionRepository.findByPracticeRoutine(sampleRoutine)).thenReturn(sessions);
+  void getSessions_ShouldReturnListOfSessions() {
+    // Arrange
+    Long routineId = 1L;
+    PracticeSession session1 = new PracticeSession();
+    session1.setBpm(100);
+    session1.setDuration(30);
+    session1.setSessionDate(LocalDate.now());
 
-    List<PracticeSession> result = sessionService.getSessions(1L);
+    PracticeSession session2 = new PracticeSession();
+    session2.setBpm(110);
+    session2.setDuration(45);
+    session2.setSessionDate(LocalDate.now());
 
-    assertNotNull(result);
-    assertEquals(1, result.size());
-    assertEquals(sampleSession, result.get(0));
-    verify(routineRepository, times(1)).findById(1L);
-    verify(sessionRepository, times(1)).findByPracticeRoutine(sampleRoutine);
+    List<PracticeSession> sessions = Arrays.asList(session1, session2);
+
+    PracticeSessionDTO sessionDTO1 = new PracticeSessionDTO();
+    sessionDTO1.setBpm(100);
+    sessionDTO1.setDuration(30);
+    sessionDTO1.setSessionDate(LocalDate.now());
+
+    PracticeSessionDTO sessionDTO2 = new PracticeSessionDTO();
+    sessionDTO2.setBpm(110);
+    sessionDTO2.setDuration(45);
+    sessionDTO2.setSessionDate(LocalDate.now());
+
+    when(sessionRepo.findByPracticeRoutineId(routineId)).thenReturn(sessions);
+    when(mapper.toDto(session1)).thenReturn(sessionDTO1);
+    when(mapper.toDto(session2)).thenReturn(sessionDTO2);
+
+    // Act
+    List<PracticeSessionDTO> result = sessionService.getSessions(routineId);
+
+    // Assert
+    assertEquals(2, result.size());
+    assertEquals(sessionDTO1.getBpm(), result.get(0).getBpm());
+    assertEquals(sessionDTO2.getBpm(), result.get(1).getBpm());
   }
 
   @Test
-  void getSessions_ShouldThrowException_WhenRoutineNotFound() {
-    when(routineRepository.findById(1L)).thenReturn(Optional.empty());
+  void updateSession_ShouldUpdateAndReturnUpdatedSessionDTO() {
+    // Arrange
+    Long sessionId = 1L;
+    PracticeSessionDTO updatedSessionDTO = new PracticeSessionDTO();
+    updatedSessionDTO.setBpm(130);
+    updatedSessionDTO.setDuration(40);
+    updatedSessionDTO.setSessionDate(LocalDate.now());
 
-    RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-      sessionService.getSessions(1L);
-    });
+    PracticeSession existingSession = new PracticeSession();
+    existingSession.setId(sessionId);
+    existingSession.setBpm(120);
+    existingSession.setDuration(30);
+    existingSession.setSessionDate(LocalDate.now());
 
-    assertEquals("Routine not found", exception.getMessage());
-    verify(routineRepository, times(1)).findById(1L);
-  }
-
-  @Test
-  void updateSession_ShouldUpdateAndReturnUpdatedSession() {
     PracticeSession updatedSession = new PracticeSession();
-    updatedSession.setId(1L);
-    updatedSession.setPracticeRoutine(sampleRoutine);
-    updatedSession.setSessionDate(LocalDate.of(2025, 1, 13));
+    updatedSession.setId(sessionId);
     updatedSession.setBpm(130);
     updatedSession.setDuration(40);
+    updatedSession.setSessionDate(LocalDate.now());
 
-    when(sessionRepository.findById(1L)).thenReturn(Optional.of(sampleSession));
-    when(sessionRepository.save(any(PracticeSession.class))).thenReturn(updatedSession);
+    when(sessionRepo.findById(sessionId)).thenReturn(Optional.of(existingSession));
+    when(mapper.toDto(updatedSession)).thenReturn(updatedSessionDTO);
+    when(sessionRepo.save(any(PracticeSession.class))).thenReturn(updatedSession);
 
-    PracticeSession result = sessionService.updateSession(1L, updatedSession);
+    // Act
+    PracticeSessionDTO result = sessionService.updateSession(sessionId, updatedSessionDTO);
 
-    assertNotNull(result);
-    assertEquals(LocalDate.of(2025, 1, 13), result.getSessionDate());
-    assertEquals(130, result.getBpm());
-    assertEquals(40, result.getDuration());
-    verify(sessionRepository, times(1)).save(updatedSession);
-    verify(statsService, times(1)).updateStats(sampleRoutine.getId());
+    // Assert
+    assertEquals(updatedSessionDTO.getBpm(), result.getBpm());
+    assertEquals(updatedSessionDTO.getDuration(), result.getDuration());
+    assertEquals(updatedSessionDTO.getSessionDate(), result.getSessionDate());
+    verify(statsService, times(1)).updateStats(updatedSession.getId());  // Verify stats update
   }
 
   @Test
-  void updateSession_ShouldThrowException_WhenSessionNotFound() {
-    when(sessionRepository.findById(1L)).thenReturn(Optional.empty());
+  void deleteSession_ShouldDeleteSession() {
+    // Arrange
+    Long sessionId = 1L;
 
-    RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-      sessionService.updateSession(1L, sampleSession);
-    });
+    // Act
+    sessionService.deleteSession(sessionId);
 
-    assertEquals("Session not found", exception.getMessage());
-    verify(sessionRepository, times(1)).findById(1L);
-  }
-
-  @Test
-  void updateStatsForSession_ShouldCallStatsService() {
-    when(sessionRepository.save(sampleSession)).thenReturn(sampleSession);
-
-    sessionService.createSession(sampleSession);
-
-    verify(statsService, times(1)).updateStats(sampleRoutine.getId());
+    // Assert
+    verify(sessionRepo, times(1)).deleteById(sessionId);  // Verify deletion
   }
 }

@@ -1,26 +1,22 @@
 package com.reson8.app.controller;
 
-import com.reson8.app.model.PracticeStatistics;
+import com.reson8.app.dto.PracticeStatisticsDTO;
 import com.reson8.app.service.PracticeStatisticsService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
 public class PracticeStatisticsControllerTest {
-
-  private MockMvc mockMvc;
 
   @Mock
   private PracticeStatisticsService statisticsService;
@@ -28,55 +24,55 @@ public class PracticeStatisticsControllerTest {
   @InjectMocks
   private PracticeStatisticsController statisticsController;
 
-  private ObjectMapper objectMapper;
+  private MockMvc mockMvc;
 
   @BeforeEach
   public void setUp() {
+    MockitoAnnotations.openMocks(this);
     mockMvc = MockMvcBuilders.standaloneSetup(statisticsController).build();
-    objectMapper = new ObjectMapper();
   }
 
   @Test
-  public void getRoutineStats_ShouldReturnStatistics() throws Exception {
-    Long routineId = 1L;
-    PracticeStatistics practiceStatistics = new PracticeStatistics();
-    practiceStatistics.setTotalPracticeTime(120);
-    practiceStatistics.setTotalSessions(10);
-    practiceStatistics.setHighestBPM(130);
-    practiceStatistics.setTotalBPMIncrease(15);
+  public void getRoutineStatsTest() throws Exception {
+    // Create a mock PracticeStatisticsDTO object
+    PracticeStatisticsDTO statsDTO = new PracticeStatisticsDTO();
+    statsDTO.setTotalPracticeTime(120);
+    statsDTO.setTotalSessions(3);
+    statsDTO.setHighestBPM(150);
+    statsDTO.setTotalBPMIncrease(20);
 
-    when(statisticsService.getStats(routineId)).thenReturn(practiceStatistics);
+    // Mock the behavior of statisticsService.getStats() method
+    when(statisticsService.getStats(1L)).thenReturn(statsDTO);
 
-    mockMvc.perform(get("/api/statistics/routine/{routineId}", routineId))
-        .andExpect(status().isOk())
+    // Perform a GET request and validate the response
+    mockMvc.perform(get("/api/statistics/routine/{routineId}", 1L)
+            .contentType("application/json"))
+        .andExpect(status().isOk())  // Expect 200 status code
         .andExpect(jsonPath("$.totalPracticeTime").value(120))
-        .andExpect(jsonPath("$.totalSessions").value(10))
-        .andExpect(jsonPath("$.highestBPM").value(130))
-        .andExpect(jsonPath("$.totalBPMIncrease").value(15));
-
-    verify(statisticsService, times(1)).getStats(routineId);
+        .andExpect(jsonPath("$.totalSessions").value(3))
+        .andExpect(jsonPath("$.highestBPM").value(150))
+        .andExpect(jsonPath("$.totalBPMIncrease").value(20));
   }
 
   @Test
-  public void updateStats_ShouldReturnUpdatedStatistics() throws Exception {
-    Long routineId = 1L;
-    PracticeStatistics updatedStatistics = new PracticeStatistics();
-    updatedStatistics.setTotalPracticeTime(150);
-    updatedStatistics.setTotalSessions(12);
-    updatedStatistics.setHighestBPM(140);
-    updatedStatistics.setTotalBPMIncrease(20);
+  public void updateStatsTest() throws Exception {
+    // Create a mock PracticeStatisticsDTO object
+    PracticeStatisticsDTO updatedStatsDTO = new PracticeStatisticsDTO();
+    updatedStatsDTO.setTotalPracticeTime(150);
+    updatedStatsDTO.setTotalSessions(4);
+    updatedStatsDTO.setHighestBPM(160);
+    updatedStatsDTO.setTotalBPMIncrease(30);
 
-    when(statisticsService.updateStats(routineId)).thenReturn(updatedStatistics);
+    // Mock the behavior of statisticsService.updateStats() method
+    when(statisticsService.updateStats(1L)).thenReturn(updatedStatsDTO);
 
-    mockMvc.perform(put("/api/statistics/routine/{routineId}/update", routineId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(updatedStatistics)))
-        .andExpect(status().isOk())
+    // Perform a PUT request and validate the response
+    mockMvc.perform(put("/api/statistics/routine/{routineId}/update", 1L)
+            .contentType("application/json"))
+        .andExpect(status().isOk())  // Expect 200 status code
         .andExpect(jsonPath("$.totalPracticeTime").value(150))
-        .andExpect(jsonPath("$.totalSessions").value(12))
-        .andExpect(jsonPath("$.highestBPM").value(140))
-        .andExpect(jsonPath("$.totalBPMIncrease").value(20));
-
-    verify(statisticsService, times(1)).updateStats(routineId);
+        .andExpect(jsonPath("$.totalSessions").value(4))
+        .andExpect(jsonPath("$.highestBPM").value(160))
+        .andExpect(jsonPath("$.totalBPMIncrease").value(30));
   }
 }

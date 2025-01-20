@@ -1,5 +1,6 @@
 package com.reson8.app.controller;
 
+import com.reson8.app.dto.PracticeStatisticsDTO;
 import com.reson8.app.model.PracticeStatistics;
 import com.reson8.app.service.PracticeStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +16,15 @@ public class PracticeStatisticsController {
   private PracticeStatisticsService statisticsService;
 
   @GetMapping("/routine/{routineId}")
-  public ResponseEntity<PracticeStatistics> getRoutineStats(@PathVariable Long routineId) {
-    PracticeStatistics stats = statisticsService.getStats(routineId);
+  public ResponseEntity<PracticeStatisticsDTO> getRoutineStats(@PathVariable Long routineId) {
+    PracticeStatisticsDTO stats = statisticsService.getStats(routineId);
     return new ResponseEntity<>(stats, HttpStatus.OK);
   }
 
   // This endpoint is for internal use, to trigger when a session changes.
   @PutMapping("/routine/{routineId}/update")
-  public ResponseEntity<PracticeStatistics> updateStats(@PathVariable Long routineId) {
-    PracticeStatistics stats = statisticsService.updateStats(routineId);
+  public ResponseEntity<PracticeStatisticsDTO> updateStats(@PathVariable Long routineId) {
+    PracticeStatisticsDTO stats = statisticsService.updateStats(routineId);
     return new ResponseEntity<>(stats, HttpStatus.OK);
   }
 }

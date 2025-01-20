@@ -1,5 +1,7 @@
 package com.reson8.app.service;
 
+import com.reson8.app.dto.PracticeStatisticsDTO;
+import com.reson8.app.mapper.PracticeStatisticsMapper;
 import com.reson8.app.model.PracticeSession;
 import com.reson8.app.model.PracticeStatistics;
 import com.reson8.app.repository.PracticeSessionRepository;
@@ -13,11 +15,12 @@ public class PracticeStatisticsService {
 
   @Autowired
   private PracticeStatisticsRepository statsRepo;
-
   @Autowired
   private PracticeSessionRepository sessionRepo;
+  @Autowired
+  private PracticeStatisticsMapper mapper;
 
-  public PracticeStatistics updateStats(Long routineId) {
+  public PracticeStatisticsDTO updateStats(Long routineId) {
     List<PracticeSession> sessions = sessionRepo.findByPracticeRoutineId(routineId);
 
     int totalPracticeTime = 0;
@@ -44,11 +47,11 @@ public class PracticeStatisticsService {
     return saveStats(stats);
   }
 
-  public PracticeStatistics saveStats(PracticeStatistics stats) {
-    return statsRepo.save(stats);
+  public PracticeStatisticsDTO saveStats(PracticeStatistics stats) {
+    return mapper.toDto(statsRepo.save(stats));
   }
 
-  public PracticeStatistics getStats(Long id) {
-    return statsRepo.findByPracticeRoutineId(id);
+  public PracticeStatisticsDTO getStats(Long id) {
+    return mapper.toDto(statsRepo.findByPracticeRoutineId(id));
   }
 }

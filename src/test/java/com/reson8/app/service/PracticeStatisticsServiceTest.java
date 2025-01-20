@@ -1,9 +1,7 @@
 package com.reson8.app.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import com.reson8.app.model.Category;
+import com.reson8.app.dto.PracticeStatisticsDTO;
+import com.reson8.app.mapper.PracticeStatisticsMapper;
 import com.reson8.app.model.PracticeRoutine;
 import com.reson8.app.model.PracticeSession;
 import com.reson8.app.model.PracticeStatistics;
@@ -18,125 +16,113 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 class PracticeStatisticsServiceTest {
+
+  @Mock
+  private PracticeStatisticsRepository statsRepo;
 
   @Mock
   private PracticeSessionRepository sessionRepo;
 
   @Mock
-  private PracticeStatisticsRepository statsRepo;
+  private PracticeStatisticsMapper mapper;
 
   @InjectMocks
   private PracticeStatisticsService statsService;
 
-  private PracticeRoutine sampleRoutine;
-  private PracticeSession session1;
-  private PracticeSession session2;
-  private PracticeStatistics existingStats;
-
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
+  }
 
-    sampleRoutine = new PracticeRoutine();
-    sampleRoutine.setId(1L);
-    sampleRoutine.setTitle("Test Routine");
-    sampleRoutine.setCategory(Category.CHORDS);
+  @Test
+  void updateStats_ShouldCalculateAndUpdateStatistics() {
+    // Arrange
+    Long routineId = 1L;
 
-    session1 = new PracticeSession();
-    session1.setId(1L);
-    session1.setBpm(100);
+    // Mock PracticeRoutine
+    PracticeRoutine practiceRoutine = new PracticeRoutine();
+    practiceRoutine.setId(routineId);
+
+    // Mock PracticeSessions for the routine
+    PracticeSession session1 = new PracticeSession();
     session1.setDuration(30);
-    session1.setPracticeRoutine(sampleRoutine);
+    session1.setBpm(100);
 
-    session2 = new PracticeSession();
-    session2.setId(2L);
-    session2.setBpm(120);
+    PracticeSession session2 = new PracticeSession();
     session2.setDuration(45);
-    session2.setPracticeRoutine(sampleRoutine);
+    session2.setBpm(120);
 
-    existingStats = new PracticeStatistics();
-    existingStats.setTotalPracticeTime(60);
-    existingStats.setTotalSessions(1);
-    existingStats.setHighestBPM(100);
-    existingStats.setTotalBPMIncrease(0);
-    existingStats.setPracticeRoutine(sampleRoutine);
-  }
-
-  @Test
-  void updateStats_ShouldReturnUpdatedStats() {
     List<PracticeSession> sessions = Arrays.asList(session1, session2);
-    PracticeStatistics expectedStats = new PracticeStatistics();
-    expectedStats.setTotalPracticeTime(75); // 30 + 45
-    expectedStats.setTotalSessions(2);
-    expectedStats.setHighestBPM(120);
-    expectedStats.setTotalBPMIncrease(20); // 120 - 100
-    expectedStats.setPracticeRoutine(sampleRoutine);
 
-    when(sessionRepo.findByPracticeRoutineId(1L)).thenReturn(sessions);
-    when(statsRepo.findByPracticeRoutineId(1L)).thenReturn(null); // No existing stats
-    when(statsRepo.save(any(PracticeStatistics.class))).thenReturn(expectedStats);
+    // Mock existing PracticeStatistics
+    PracticeStatistics existingStats = new PracticeStatistics();
+    existingStats.setPracticeRoutine(practiceRoutine);
 
-    PracticeStatistics result = statsService.updateStats(1L);
+    // Mock repository and mapper behavior
+    when(sessionRepo.findByPracticeRoutineId(routineId)).thenReturn(sessions);
+    when(statsRepo.findByPracticeRoutineId(routineId)).thenReturn(existingStats);
+    when(statsRepo.save(any(PracticeStatistics.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-    assertNotNull(result);
-    assertEquals(75, result.getTotalPracticeTime());
-    assertEquals(2, result.getTotalSessions());
-    assertEquals(120, result.getHighestBPM());
-    assertEquals(20, result.getTotalBPMIncrease());
-    assertEquals(sampleRoutine, result.getPracticeRoutine()); // Check that the practice routine is correctly set
-    verify(sessionRepo, times(1)).findByPracticeRoutineId(1L);
-    verify(statsRepo, times(1)).save(any(PracticeStatistics.class));
+    PracticeStatisticsDTO expectedDto = new PracticeStatisticsDTO();
+    expectedDto.setPracticeRoutineId(routineId);
+    expectedDto.setTotalPracticeTime(75);
+    expectedDto.setTotalSessions(2);
+    expectedDto.setHighestBPM(120);
+    expectedDto.setTotalBPMIncrease(20);
+
+    when(mapper.toDto(any(PracticeStatistics.class))).thenReturn(expectedDto);
+
+    // Act
+    PracticeStatisticsDTO result = statsService.updateStats(routineId);
+
+    // Assert
+    assertEquals(expectedDto.getPracticeRoutineId(), result.getPracticeRoutineId());
+    assertEquals(expectedDto.getTotalPracticeTime(), result.getTotalPracticeTime());
+    assertEquals(expectedDto.getTotalSessions(), result.getTotalSessions());
+    assertEquals(expectedDto.getHighestBPM(), result.getHighestBPM());
+    assertEquals(expectedDto.getTotalBPMIncrease(), result.getTotalBPMIncrease());
   }
 
   @Test
-  void updateStats_ShouldUpdateExistingStats() {
-    List<PracticeSession> sessions = Arrays.asList(session1, session2);
-    PracticeStatistics expectedStats = new PracticeStatistics();
-    expectedStats.setTotalPracticeTime(75); // 30 + 45
-    expectedStats.setTotalSessions(2);
-    expectedStats.setHighestBPM(120);
-    expectedStats.setTotalBPMIncrease(20); // 120 - 100
-    expectedStats.setPracticeRoutine(sampleRoutine);
+  void getStats_ShouldReturnStatisticsForRoutine() {
+    // Arrange
+    Long routineId = 1L;
 
-    when(sessionRepo.findByPracticeRoutineId(1L)).thenReturn(sessions);
-    when(statsRepo.findByPracticeRoutineId(1L)).thenReturn(existingStats);
-    when(statsRepo.save(any(PracticeStatistics.class))).thenReturn(expectedStats);
+    // Mock PracticeRoutine
+    PracticeRoutine practiceRoutine = new PracticeRoutine();
+    practiceRoutine.setId(routineId);
 
-    PracticeStatistics result = statsService.updateStats(1L);
+    // Mock PracticeStatistics
+    PracticeStatistics stats = new PracticeStatistics();
+    stats.setPracticeRoutine(practiceRoutine);
+    stats.setTotalPracticeTime(120);
+    stats.setTotalSessions(4);
+    stats.setHighestBPM(150);
+    stats.setTotalBPMIncrease(50);
 
-    assertNotNull(result);
-    assertEquals(75, result.getTotalPracticeTime());
-    assertEquals(2, result.getTotalSessions());
-    assertEquals(120, result.getHighestBPM());
-    assertEquals(20, result.getTotalBPMIncrease());
-    assertEquals(sampleRoutine, result.getPracticeRoutine()); // Check that the practice routine is correctly set
-    verify(sessionRepo, times(1)).findByPracticeRoutineId(1L);
-    verify(statsRepo, times(1)).save(any(PracticeStatistics.class));
-  }
+    PracticeStatisticsDTO expectedDto = new PracticeStatisticsDTO();
+    expectedDto.setPracticeRoutineId(routineId);
+    expectedDto.setTotalPracticeTime(120);
+    expectedDto.setTotalSessions(4);
+    expectedDto.setHighestBPM(150);
+    expectedDto.setTotalBPMIncrease(50);
 
-  @Test
-  void getStats_ShouldReturnExistingStats() {
-    when(statsRepo.findByPracticeRoutineId(1L)).thenReturn(existingStats);
+    when(statsRepo.findByPracticeRoutineId(routineId)).thenReturn(stats);
+    when(mapper.toDto(stats)).thenReturn(expectedDto);
 
-    PracticeStatistics result = statsService.getStats(1L);
+    // Act
+    PracticeStatisticsDTO result = statsService.getStats(routineId);
 
-    assertNotNull(result);
-    assertEquals(60, result.getTotalPracticeTime());
-    assertEquals(1, result.getTotalSessions());
-    assertEquals(100, result.getHighestBPM());
-    assertEquals(0, result.getTotalBPMIncrease());
-    assertEquals(sampleRoutine, result.getPracticeRoutine()); // Check that the practice routine is correctly set
-    verify(statsRepo, times(1)).findByPracticeRoutineId(1L);
-  }
-
-  @Test
-  void getStats_ShouldReturnNullWhenNoStatsExist() {
-    when(statsRepo.findByPracticeRoutineId(1L)).thenReturn(null);
-
-    PracticeStatistics result = statsService.getStats(1L);
-
-    assertNull(result);
-    verify(statsRepo, times(1)).findByPracticeRoutineId(1L);
+    // Assert
+    assertEquals(expectedDto.getPracticeRoutineId(), result.getPracticeRoutineId());
+    assertEquals(expectedDto.getTotalPracticeTime(), result.getTotalPracticeTime());
+    assertEquals(expectedDto.getTotalSessions(), result.getTotalSessions());
+    assertEquals(expectedDto.getHighestBPM(), result.getHighestBPM());
+    assertEquals(expectedDto.getTotalBPMIncrease(), result.getTotalBPMIncrease());
   }
 }

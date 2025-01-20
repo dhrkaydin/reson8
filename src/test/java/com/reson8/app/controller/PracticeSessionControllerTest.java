@@ -1,6 +1,6 @@
 package com.reson8.app.controller;
 
-import com.reson8.app.model.PracticeSession;
+import com.reson8.app.dto.PracticeSessionDTO;
 import com.reson8.app.service.PracticeSessionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,34 +42,36 @@ public class PracticeSessionControllerTest {
   @Test
   public void createSession_ShouldReturnCreatedSession() throws Exception {
     // Given
-    PracticeSession practiceSession = new PracticeSession();
-    practiceSession.setId(1L);  // assuming the session has an ID field
-    practiceSession.setDuration(120);
-    practiceSession.setBpm(100);
+    PracticeSessionDTO practiceSessionDTO = new PracticeSessionDTO();
+    practiceSessionDTO.setId(1L);
+    practiceSessionDTO.setDuration(120);
+    practiceSessionDTO.setBpm(100);
+    practiceSessionDTO.setPracticeRoutineId(1L);
 
-    when(sessionService.createSession(any(PracticeSession.class))).thenReturn(practiceSession);
+    when(sessionService.createSession(any(PracticeSessionDTO.class))).thenReturn(practiceSessionDTO);
 
     // When & Then
     mockMvc.perform(post("/api/sessions")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(practiceSession)))
+            .content(objectMapper.writeValueAsString(practiceSessionDTO)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").value(1L))
         .andExpect(jsonPath("$.duration").value(120))
         .andExpect(jsonPath("$.bpm").value(100));
 
-    verify(sessionService, times(1)).createSession(any(PracticeSession.class));
+    verify(sessionService, times(1)).createSession(any(PracticeSessionDTO.class));
   }
 
   @Test
   public void getSessions_ShouldReturnListOfSessions() throws Exception {
     // Given
-    PracticeSession practiceSession = new PracticeSession();
-    practiceSession.setId(1L);
-    practiceSession.setDuration(120);
-    practiceSession.setBpm(100);
+    PracticeSessionDTO practiceSessionDTO = new PracticeSessionDTO();
+    practiceSessionDTO.setId(1L);
+    practiceSessionDTO.setDuration(120);
+    practiceSessionDTO.setBpm(100);
+    practiceSessionDTO.setPracticeRoutineId(1L);
 
-    when(sessionService.getSessions(1L)).thenReturn(Collections.singletonList(practiceSession));
+    when(sessionService.getSessions(1L)).thenReturn(Collections.singletonList(practiceSessionDTO));
 
     // When & Then
     mockMvc.perform(get("/api/sessions/routine/1"))
@@ -85,22 +87,38 @@ public class PracticeSessionControllerTest {
   public void updateSession_ShouldReturnUpdatedSession() throws Exception {
     // Given
     Long sessionId = 1L;
-    PracticeSession updatedSession = new PracticeSession();
-    updatedSession.setId(sessionId);
-    updatedSession.setDuration(150);
-    updatedSession.setBpm(110);
+    PracticeSessionDTO updatedSessionDTO = new PracticeSessionDTO();
+    updatedSessionDTO.setId(sessionId);
+    updatedSessionDTO.setDuration(150);
+    updatedSessionDTO.setBpm(110);
+    updatedSessionDTO.setPracticeRoutineId(1L);
 
-    when(sessionService.updateSession(eq(sessionId), any(PracticeSession.class))).thenReturn(updatedSession);
+    when(sessionService.updateSession(eq(sessionId), any(PracticeSessionDTO.class))).thenReturn(updatedSessionDTO);
 
     // When & Then
     mockMvc.perform(put("/api/sessions/session/{sessionId}", sessionId)
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(updatedSession)))
+            .content(objectMapper.writeValueAsString(updatedSessionDTO)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(sessionId))
         .andExpect(jsonPath("$.duration").value(150))
         .andExpect(jsonPath("$.bpm").value(110));
 
-    verify(sessionService, times(1)).updateSession(eq(sessionId), any(PracticeSession.class));
+    verify(sessionService, times(1)).updateSession(eq(sessionId), any(PracticeSessionDTO.class));
+  }
+
+  @Test
+  public void deleteSession_ShouldReturnSuccessMessage() throws Exception {
+    // Given
+    Long sessionId = 1L;
+
+    doNothing().when(sessionService).deleteSession(sessionId);
+
+    // When & Then
+    mockMvc.perform(delete("/api/sessions/session/{sessionId}", sessionId))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Session deleted"));
+
+    verify(sessionService, times(1)).deleteSession(sessionId);
   }
 }
