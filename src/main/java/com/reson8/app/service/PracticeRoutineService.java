@@ -2,8 +2,10 @@ package com.reson8.app.service;
 
 import com.reson8.app.dto.PracticeRoutineDTO;
 import com.reson8.app.mapper.PracticeRoutineMapper;
+import com.reson8.app.model.Category;
 import com.reson8.app.model.PracticeRoutine;
 import com.reson8.app.repository.PracticeRoutineRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,5 +60,15 @@ public class PracticeRoutineService {
   public void deleteRoutine(Long routineId) {
 
     routineRepo.deleteById(routineId);
+  }
+
+  public List<String> getCategories() {
+    List<String> categoryList = new ArrayList<>();
+
+    for (Category category : Category.values()) {
+      categoryList.add(category.name());
+    }
+
+    return categoryList;
   }
 }

@@ -47,4 +47,10 @@ public class PracticeRoutineController {
     routineService.deleteRoutine(routineId);
     return new ResponseEntity<>("Successfully deleted routine.", HttpStatus.OK);
   }
+
+  @GetMapping("/categories")
+  public ResponseEntity<List<String>> getCategories() {
+    List<String> categories = routineService.getCategories();
+    return new ResponseEntity<>(categories, HttpStatus.OK);
+  }
 }
