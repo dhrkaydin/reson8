@@ -1,6 +1,7 @@
 package com.reson8.app.controller;
 
 import com.reson8.app.dto.PracticeRoutineDTO;
+import com.reson8.app.dto.PracticeRoutineTitleDTO;
 import com.reson8.app.service.PracticeRoutineService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,5 +53,11 @@ public class PracticeRoutineController {
   public ResponseEntity<List<String>> getCategories() {
     List<String> categories = routineService.getCategories();
     return new ResponseEntity<>(categories, HttpStatus.OK);
+  }
+
+  @GetMapping("/titles")
+  public ResponseEntity<List<PracticeRoutineTitleDTO>> getTitles() {
+    List<PracticeRoutineTitleDTO> titles = routineService.getTitles();
+    return new ResponseEntity<>(titles, HttpStatus.OK);
   }
 }

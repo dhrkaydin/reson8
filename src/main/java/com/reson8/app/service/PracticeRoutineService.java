@@ -1,6 +1,7 @@
 package com.reson8.app.service;
 
 import com.reson8.app.dto.PracticeRoutineDTO;
+import com.reson8.app.dto.PracticeRoutineTitleDTO;
 import com.reson8.app.mapper.PracticeRoutineMapper;
 import com.reson8.app.model.Category;
 import com.reson8.app.model.PracticeRoutine;
@@ -70,5 +71,15 @@ public class PracticeRoutineService {
     }
 
     return categoryList;
+  }
+
+  public List<PracticeRoutineTitleDTO> getTitles() {
+    List<PracticeRoutineTitleDTO> titles = new ArrayList<>();
+
+    routineRepo.findAll().forEach(
+        routine -> titles.add(new PracticeRoutineTitleDTO(routine.getId(), routine.getTitle()))
+    );
+
+    return titles;
   }
 }
