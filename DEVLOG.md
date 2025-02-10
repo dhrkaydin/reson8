@@ -45,3 +45,14 @@ and I don't need complex mapping for now as I only have 3 models.
 I looked into removing the PracticeRoutine object in the other 2 models, but then I have to manually manage orphan removal and such, which does not seem like the right option to me.
 So I will rollback that design choice.
 ----------- 
+
+10-02-2025:
+
+Did not update this in a while and probably will move this somewhere else. I was mostly working on the front-end, and as of writing this, the statistics page is really the only thing left
+aside from minor styling changes.
+
+I tried to bundle the front-end into Electron to run it as a desktop app, which was a pain to get working. I ended up downgrading the Vite version
+of the Front-End, and changing the Router to HashRouter instead of BrowserRouter. That oversight caused me hours of debugging, but I was not even
+aware that there are different kinds of Router. Good reminder to dive deeper into docs :)
+
+-----------
