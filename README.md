@@ -1,16 +1,31 @@
-# Reson8
+# RESON8 Backend
 
-### Basic commands
-mvn clean install  
-mvn clean test  
+#### About
+Back-end for RESON8, a music practice tracker. Right now it's just a CRUD API for a dockerized MySQL database.
 
-### Running the application
-Navigate to the /docker/database folder and do "docker compose up -d" to start the database.
-Afterwards you can boot up the backend by running the main method in the Reson8Application class.
+#### Tech Stack
+Java 11, Spring Boot, Docker, Maven, JPA, Hibernate, MySQL, JUnit, Mockito, Swagger, OpenAPI 
 
-The resources folder in the root contains a postman collection to manually test the PracticeRoutine controller.  
+## Running/Building
+### First boot
+```
+    mvn clean install  
+    mvn clean test
+    mvn spring-boot:run
+```
 
-### About the application
-This is meant as a personal practice tracker, and I intend to display statistics of certain practice routines, improvements, and other fun stuff like that.  
-Beep boop icecream scoop.
+### Setting up the Database
+The database is dockerized and can be started with the following command:
 
+```
+    cd docker/database
+    docker compose up -d
+```
+
+Without this database up and running the application will not start.
+
+### Manually Testing
+
+Aside from the JUnit tests, the resources folder in the root contains a postman collection to manually test the PracticeRoutine controller.
+I'm already getting lazy updating it but it should be a good baseline.
+Configure the DB connection in the application.properties file.

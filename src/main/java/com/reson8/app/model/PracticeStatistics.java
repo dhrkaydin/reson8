@@ -30,7 +30,7 @@ public class PracticeStatistics {
   @Column(name = "total_bpm_increase")
   private int totalBPMIncrease;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToOne()
   @JoinColumn(name = "practice_routine_id", nullable = false)
   private PracticeRoutine practiceRoutine;
 }

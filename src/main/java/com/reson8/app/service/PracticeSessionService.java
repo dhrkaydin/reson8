@@ -62,6 +62,6 @@ public class PracticeSessionService {
   }
 
   public void updateStatsForSession(PracticeSession session) {
-    statsService.updateStats(session.getId());
+    statsService.updateStats(session.getPracticeRoutine().getId());
   }
 }
