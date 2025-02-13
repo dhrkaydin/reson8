@@ -1,7 +1,6 @@
 package com.reson8.app.controller;
 
 import com.reson8.app.dto.PracticeStatisticsDTO;
-import com.reson8.app.model.PracticeStatistics;
 import com.reson8.app.service.PracticeStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

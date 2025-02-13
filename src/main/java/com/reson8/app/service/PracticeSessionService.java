@@ -7,6 +7,7 @@ import com.reson8.app.model.PracticeSession;
 import com.reson8.app.repository.PracticeRoutineRepository;
 import com.reson8.app.repository.PracticeSessionRepository;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,13 @@ public class PracticeSessionService {
         .toList();
   }
 
+  public List<PracticeSessionDTO> getAllSessions() {
+    return sessionRepo.findAll().stream()
+        .map(mapper::toDto)
+        .sorted(Comparator.comparing(PracticeSessionDTO::getSessionDate))
+        .toList();
+  }
+
   public PracticeSessionDTO updateSession(Long sessionId, PracticeSessionDTO updatedSession) {
     return sessionRepo.findById(sessionId)
         .map(session -> {
@@ -63,5 +71,21 @@ public class PracticeSessionService {
 
   public void updateStatsForSession(PracticeSession session) {
     statsService.updateStats(session.getPracticeRoutine().getId());
+  }
+
+  public List<PracticeSessionDTO> getSessionsInRange(Long routineId, LocalDate startDate, LocalDate endDate) {
+    return sessionRepo.findByPracticeRoutineIdAndSessionDateBetween(routineId, startDate, endDate)
+        .stream()
+        .map(mapper::toDto)
+        .sorted(Comparator.comparing(PracticeSessionDTO::getSessionDate))
+        .toList();
+  }
+
+  public List<PracticeSessionDTO> getSessionsInRangeForAllRoutines(LocalDate startDate, LocalDate endDate) {
+    return sessionRepo.findBySessionDateBetween(startDate, endDate)
+        .stream()
+        .map(mapper::toDto)
+        .sorted(Comparator.comparing(PracticeSessionDTO::getSessionDate))
+        .toList();
   }
 }

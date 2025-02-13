@@ -59,7 +59,6 @@ public class PracticeRoutineService {
 
   @Transactional
   public void deleteRoutine(Long routineId) {
-
     routineRepo.deleteById(routineId);
   }
 
